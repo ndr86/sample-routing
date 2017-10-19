@@ -66,6 +66,11 @@ public class CountryController {
         return model;
     }
 
+    @RequestMapping(value = "/secured", method = RequestMethod.GET)
+    public String getSecuredCountries() {
+        return "redirect:/";
+    }
+
     private List<Country> retrieveData(boolean sortable) {
         String requestURL = "https://restcountries.eu/rest/v2/all";
         HttpURLConnection connection = null;
