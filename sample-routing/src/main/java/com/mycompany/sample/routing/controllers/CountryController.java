@@ -92,18 +92,19 @@ public class CountryController {
 
                             if (countryObject != null
                                     && countryObject.get("name") != null) {
-                                String name = (String) countryObject.get("name");
+                                String name = String.valueOf(countryObject.get("name"));
                                 System.out.print(name + ", ");
 
                                 JSONArray currencies = countryObject.getJSONArray("currencies");
 
                                 if (currencies != null) {
                                     for (int k = 0; k < currencies.length(); k++) {
+//                                        System.out.print(k);
                                         JSONObject currencyObject = currencies.getJSONObject(k);
 
                                         if (currencyObject != null
                                                 && currencyObject.get("name") != null) {
-                                            name = (String) currencyObject.get("name");
+                                            name = String.valueOf(currencyObject.get("name"));
                                             System.out.print(name);
                                         }
                                     }
