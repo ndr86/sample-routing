@@ -8,8 +8,11 @@ I servizi REST esposti dalla web-app sono i seguenti:
 
 #1. http://localhost:8080/sample-routing/
 
-Ritorna la lista di tutti i paesi e le valute locali
+Ritorna la lista di tutti i paesi e le valute locali caricati tramite url: "https://restcountries.eu/rest/v2/all"
 
 #2. http://localhost:8080/sample-routing/paging
+
+(PAGINAZIONE) Ritorna la un sottoinieme di tutti i paesi e le valute locali caricati tramite url: "https://restcountries.eu/rest/v2/all"
+Per facilità è stata impostata di defaul una paginazione di 5 elementi per volta
 
 #3. http://localhost:8080/sample-routing/secured
