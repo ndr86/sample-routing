@@ -6,18 +6,18 @@
     </head>
 
     <body>
-        <c:if test="${not empty lists}">
+        <c:if test="${not empty countries}">
 
             <table border=1 cellpadding=5>
                 <tr>
                     <th>Country</th>
-                    <th>Concurrencies</th>
+                    <th>Currencies</th>
                 </tr>
 
-                <c:forEach var="listValue" items="${lists}">
+                <c:forEach var="country" items="${countries}">
                     <tr>
-                        <td>${listValue}</td>
-                        <td>${listValue}</td>
+                        <td>${country.countryName}</td>
+                        <td>${country.currenciesNames}</td>
                     </tr>
                 </c:forEach>
 
