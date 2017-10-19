@@ -8,11 +8,9 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -21,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,18 +34,43 @@ public class CountryController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView getCountries() {
 
-        Set<Country> countries = retrieveData();
+        List<Country> countries = retrieveData(false);
 
         ModelAndView model = new ModelAndView("index");
         model.addObject("countries", countries);
         return model;
     }
 
-    private Set<Country> retrieveData() {
+    @RequestMapping(value = "/paging", method = RequestMethod.GET)
+    public String getPagedCountries() {
+        return "redirect:paging/0";
+    }
+
+    @RequestMapping(value = "/paging/{page}", method = RequestMethod.GET)
+    public ModelAndView getPagedCountries(@PathVariable int page) {
+
+        List<Country> countries = retrieveData(true);
+
+        int start = page * 5;
+        int end = (page + 1) * 5;
+
+        ModelAndView model = new ModelAndView("paging");
+
+        if (end <= countries.size()) {
+            model.addObject("countries", countries.subList(start, Math.min(end, countries.size())));
+        }
+        model.addObject("page", page);
+        model.addObject("prevActive", page != 0);
+        model.addObject("nextActive", end < countries.size());
+
+        return model;
+    }
+
+    private List<Country> retrieveData(boolean sortable) {
         String requestURL = "https://restcountries.eu/rest/v2/all";
         HttpURLConnection connection = null;
         int resCode = 0;
-        Set<Country> countrySet = new TreeSet<>(new CustomComparator());
+        List<Country> countryList = new ArrayList<>();
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -133,7 +157,7 @@ public class CountryController {
                                 }
                                 country.setCurrenciesNames(currenciesName.substring(0, currenciesName.length() - 2));
 
-                                countrySet.add(country);
+                                countryList.add(country);
                             }
                         }
                     }
@@ -145,7 +169,11 @@ public class CountryController {
                 break;
         }
 
-        return countrySet;
+        if (sortable) {
+            Collections.sort(countryList, new CustomComparator());
+        }
+
+        return countryList;
     }
 
     public class CustomComparator implements Comparator<Country>, Serializable {
