@@ -14,7 +14,7 @@ Ritorna la lista di tutti i paesi e le valute locali
 
 #2. http://localhost:8080/sample-routing/paging
 
-(PAGINAZIONE) Ritorna la un sottoinieme di tutti i paesi e le valute locali 
+(PAGINAZIONE) Ritorna un sottoinieme di tutti i paesi e le valute locali consentendo la paginazione 
 Per facilità è stata impostata di defaul una paginazione di 5 elementi per volta
 
 #3. http://localhost:8080/sample-routing/secured
