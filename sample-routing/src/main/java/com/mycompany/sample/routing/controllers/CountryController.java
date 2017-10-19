@@ -56,7 +56,7 @@ public class CountryController {
 
         ModelAndView model = new ModelAndView("paging");
 
-        if (end <= countries.size()) {
+        if (page >= 0 && end <= countries.size()) {
             model.addObject("countries", countries.subList(start, Math.min(end, countries.size())));
         }
         model.addObject("page", page);
