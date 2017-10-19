@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -80,14 +82,17 @@ public class CountryController {
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
             new X509TrustManager() {
+                @Override
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
+                @Override
                 public void checkClientTrusted(
                         java.security.cert.X509Certificate[] certs, String authType) {
                 }
 
+                @Override
                 public void checkServerTrusted(
                         java.security.cert.X509Certificate[] certs, String authType) {
                 }
@@ -105,7 +110,7 @@ public class CountryController {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             resCode = connection.getResponseCode();
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException ex) {
             System.out.println("Exception: " + ex.getMessage());
         }
 
