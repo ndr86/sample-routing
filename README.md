@@ -1,6 +1,6 @@
 # sample-routing
 
-Il progetto è stato realizzato in JAVA 1.7, SPRING 4.0.2.RELEASE e sviluppato con NETBEANS 8.1
+Il progetto è stato realizzato in JAVA 1.7, SPRING 4.1.6.RELEASE e sviluppato con NETBEANS 8.1
 
 La web-application è stata creata come progetto MAVEN 
 
@@ -20,5 +20,9 @@ Per facilità è stata impostata di defaul una paginazione di 5 elementi per vol
 #3. http://localhost:8080/sample-routing/secured
 
 (BASIC AUTHANTICATION) Ritorna la lista di tutti i paesi e le valute locali effettuando un'autenticazione base 
+
+#4. http://localhost:8080/sample-routing/api
+
+Ritorna la lista di tutti i paesi e le valute locali in un formato JSON ben strutturato
 
 Nel progetto sono inclusi anche i JUNIT utilizzando spring-test.
