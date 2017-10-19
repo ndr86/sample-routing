@@ -9,7 +9,7 @@
 
     <mvc:annotation-driven/>
     
-    <context:component-scan base-package="com.mycompany.sample.routing.controllers"/>
+    <context:component-scan base-package="com.mycompany.sample.routing.controllers, com.mycompany.sample.routing.api"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         

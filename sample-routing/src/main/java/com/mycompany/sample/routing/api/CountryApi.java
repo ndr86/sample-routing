@@ -1,12 +1,14 @@
-package com.mycompany.sample.routing.controllers;
+package com.mycompany.sample.routing.api;
 
-import com.mycompany.sample.routing.models.CountryFlatModel;
+import com.mycompany.sample.routing.models.CountryJsonModel;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,76 +20,54 @@ import javax.net.ssl.X509TrustManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author a.grimaldi
  */
-@Controller
-public class CountryController {
+@RestController
+public class CountryApi {
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView getCountries() {
+    @RequestMapping(value = "/api",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CountryJsonModel>> getAllCountries() {
+        List<CountryJsonModel> list = retrieveData(false);
 
-        List<CountryFlatModel> countries = retrieveData(false);
-
-        ModelAndView model = new ModelAndView("index");
-        model.addObject("countries", countries);
-        return model;
-    }
-
-    @RequestMapping(value = "/paging", method = RequestMethod.GET)
-    public String getPagedCountries() {
-        return "redirect:paging/0";
-    }
-
-    @RequestMapping(value = "/paging/{page}", method = RequestMethod.GET)
-    public ModelAndView getPagedCountries(@PathVariable int page) {
-
-        List<CountryFlatModel> countries = retrieveData(true);
-
-        int start = page * 5;
-        int end = (page + 1) * 5;
-
-        ModelAndView model = new ModelAndView("paging");
-
-        if (page >= 0 && end <= countries.size()) {
-            model.addObject("countries", countries.subList(start, Math.min(end, countries.size())));
+        if (list.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        model.addObject("page", page);
-        model.addObject("prevActive", page != 0);
-        model.addObject("nextActive", end < countries.size());
 
-        return model;
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/secured", method = RequestMethod.GET)
-    public String getSecuredCountries() {
-        return "redirect:/";
-    }
-
-    private List<CountryFlatModel> retrieveData(boolean sortable) {
+    private List<CountryJsonModel> retrieveData(boolean sortable) {
         String requestURL = "https://restcountries.eu/rest/v2/all";
         HttpURLConnection connection = null;
         int resCode = 0;
-        List<CountryFlatModel> countryList = new ArrayList<>();
+        List<CountryJsonModel> countryList = new ArrayList<>();
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
             new X509TrustManager() {
+                @Override
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
+                @Override
                 public void checkClientTrusted(
                         java.security.cert.X509Certificate[] certs, String authType) {
                 }
 
+                @Override
                 public void checkServerTrusted(
                         java.security.cert.X509Certificate[] certs, String authType) {
                 }
@@ -105,7 +85,7 @@ public class CountryController {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             resCode = connection.getResponseCode();
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException ex) {
             System.out.println("Exception: " + ex.getMessage());
         }
 
@@ -137,13 +117,13 @@ public class CountryController {
 
                             if (countryName != null) {
 
-                                CountryFlatModel country = new CountryFlatModel();
+                                CountryJsonModel country = new CountryJsonModel();
 
                                 country.setCountryName(countryName);
 
                                 JSONArray currencies = countryObject.getJSONArray("currencies");
 
-                                String currenciesName = "";
+                                List<String> currenciesNames = new ArrayList<>();
                                 if (currencies != null) {
 
                                     for (int k = 0; k < currencies.length(); k++) {
@@ -154,13 +134,12 @@ public class CountryController {
                                             String currencyName = String.valueOf(currencyObject.get("name"));
 
                                             if (currencyName != null) {
-                                                currenciesName = currenciesName.concat(currencyName);
-                                                currenciesName = currenciesName.concat(", ");
+                                                currenciesNames.add(currencyName);
                                             }
                                         }
                                     }
                                 }
-                                country.setCurrenciesNames(currenciesName.substring(0, currenciesName.length() - 2));
+                                country.setCurrenciesNames(currenciesNames);
 
                                 countryList.add(country);
                             }
@@ -181,10 +160,10 @@ public class CountryController {
         return countryList;
     }
 
-    public class CustomComparator implements Comparator<CountryFlatModel>, Serializable {
+    public class CustomComparator implements Comparator<CountryJsonModel>, Serializable {
 
         @Override
-        public int compare(CountryFlatModel c1, CountryFlatModel c2) {
+        public int compare(CountryJsonModel c1, CountryJsonModel c2) {
             return c1.getCountryName().compareTo(c2.getCountryName());
         }
     }
